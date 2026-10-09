@@ -1,0 +1,25 @@
+name: Selfunnel Tunnel
+version: "1.0.0"
+slug: selfunnel
+description: "Удалённый доступ к Home Assistant через selfunnel.ru — без проброса портов"
+url: "https://github.com/esacer1989/selfunnel-addons/tree/main/selfunnel"
+arch:
+  - amd64
+  - aarch64
+startup: application
+boot: auto
+host_network: false
+init: false
+ports: {}
+options:
+  install_token: ""
+  subdomain: ""
+  local_host: "homeassistant"
+  local_port: 8123
+  log_level: "info"
+schema:
+  install_token: str
+  subdomain: str?
+  local_host: str?
+  local_port: port?
+  log_level: list(info|warn|error|debug)?
