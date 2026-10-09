@@ -4,8 +4,8 @@ FROM $BUILD_FROM
 RUN apk add --no-cache curl bash jq ca-certificates
 
 ARG FRP_VERSION="0.58.0"
-ARG FRP_SHA256_AMD64=""
-ARG FRP_SHA256_AARCH64=""
+ARG FRP_SHA256_AMD64="09a6a170070ce02d7de6afa941d341a2caad0aa8e09fb840a64da4acba24d73a"
+ARG FRP_SHA256_AARCH64="ceef6df44f3a64b4a2076dfbb0ac02a3750b48fa0ac568478190ef477d4f2ec9"
 # TARGETARCH ставится HA addon-builder (buildkit); fallback — uname -m
 ARG TARGETARCH
 
