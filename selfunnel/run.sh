@@ -5,6 +5,8 @@ set -euo pipefail
 OPTS=/data/options.json
 # bashio::config goes через Supervisor API; в HA 2026.9.x бывает "Invalid token",
 # поэтому читаем /data/options.json напрямую (jq) — отказоустойчиво.
+ADDON_VERSION="1.1.0"
+
 if ! jq -e . "$OPTS" >/dev/null 2>&1; then
     bashio::log.fatal "$OPTS не найден — нет прав на /data? Сообщи в поддержку selfunnel"
     exit 1
@@ -23,11 +25,26 @@ if [ -z "$INSTALL_TOKEN" ]; then
     exit 1
 fi
 
+# Валидация опций перед генерацией frpc.toml (защита от TOML-инъекции кавычками/переносами
+# в конфиге от перепутанного поля options).
+if ! [[ "$LOG_LEVEL" =~ ^(info|warn|error|debug)$ ]]; then
+    bashio::log.error "log_level: допустимые значения info|warn|error|debug — выкат получил: '$LOG_LEVEL'"
+    exit 1
+fi
+if ! [[ "$LOCAL_PORT" =~ ^[0-9]+$ ]] || [ "$LOCAL_PORT" -ge 65536 ]; then
+    bashio::log.error "local_port должен быть числом 1..65535 — получил: '$LOCAL_PORT'"
+    exit 1
+fi
+if ! [[ "$LOCAL_HOST" =~ ^[A-Za-z0-9][A-Za-z0-9.\-]{0,253}[A-Za-z0-9]$|^localhost$ ]]; then
+    bashio::log.error "local_host: разрешены только буквы/цифры/точка/дефис — получил небезопасное значение"
+    exit 1
+fi
+
 bashio::log.info "Проверка токена у selfunnel..."
 HTTP_CODE="000"
 RESP=""
 for i in 0 1 2 3 4; do
-    RESP=$(curl -fsS -X POST "$API_URL" \
+    RESP=$(curl -fsS -A "selfunnel-addon/${ADDON_VERSION}" -X POST "$API_URL" \
              -H "Content-Type: application/json" \
              -d "{\"install_token\":\"$INSTALL_TOKEN\"}" 2>/dev/null) \
         && HTTP_CODE=200 || HTTP_CODE=$?
@@ -70,6 +87,12 @@ FINAL_SUB="${SUBDOMAIN_OPT//[[:space:]]/}"
 [ -z "$FINAL_SUB" ] && FINAL_SUB="${API_SUB//[[:space:]]/}"
 if [ -z "$FINAL_SUB" ]; then
     bashio::log.error "Нет поддомена: создай туннель в кабинете selfunnel и перезапусти аддон"
+    exit 1
+fi
+
+# Поддомен: только [a-z0-9-] (то же ограничение, что и на бэке tunnel_manager._clean).
+if ! [[ "$FINAL_SUB" =~ ^[a-z0-9][a-z0-9-]{0,38}[a-z0-9]$ ]]; then
+    bashio::log.error "Недопустимый поддомен '$FINAL_SUB' (разрешены строчные латинские буквы, цифры и дефис)"
     exit 1
 fi
 

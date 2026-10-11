@@ -1,5 +1,5 @@
 name: Selfunnel Tunnel
-version: "1.0.0"
+version: "1.1.0"
 slug: selfunnel
 description: "Удалённый доступ к Home Assistant через selfunnel.ru — без проброса портов"
 url: "https://github.com/esacer1989/selfunnel-addons/tree/main/selfunnel"

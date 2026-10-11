@@ -1,9 +1,5 @@
 build_from:
   amd64: "ghcr.io/home-assistant/amd64-base:3.19"
   aarch64: "ghcr.io/home-assistant/aarch64-base:3.19"
-args:
-  FRP_VERSION: "0.58.0"
-  # SHA256 подставить при ревью на актуальный релиз frp_0.58.0_linux_{amd64,arm64}.tar.gz.
-  # Пока пусто — Dockerfile скачивает без проверки (честно помечено WARN в логе сборки).
-  FRP_SHA256_AMD64: ""
-  FRP_SHA256_AARCH64: ""
+# Не указываем args — тогда в силе дефолты Dockerfile: версия 0.71.0 и sha256 из манифеста
+# (перебивание пустым значением снимало checksum-гейт сборки — надзор 1.1.0).
