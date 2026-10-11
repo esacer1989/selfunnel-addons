@@ -31,7 +31,7 @@ if ! [[ "$LOG_LEVEL" =~ ^(info|warn|error|debug)$ ]]; then
     bashio::log.error "log_level: допустимые значения info|warn|error|debug — выкат получил: '$LOG_LEVEL'"
     exit 1
 fi
-if ! [[ "$LOCAL_PORT" =~ ^[0-9]+$ ]] || [ "$LOCAL_PORT" -ge 65536 ]; then
+if ! [[ "$LOCAL_PORT" =~ ^[0-9]+$ ]] || [ "$LOCAL_PORT" -ge 65536 ] || [ "$LOCAL_PORT" -eq 0 ]; then
     bashio::log.error "local_port должен быть числом 1..65535 — получил: '$LOCAL_PORT'"
     exit 1
 fi
