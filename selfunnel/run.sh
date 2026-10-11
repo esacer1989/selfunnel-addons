@@ -14,7 +14,8 @@ fi
 INSTALL_TOKEN=$(jq -r '.install_token // ""' "$OPTS")
 SUBDOMAIN_OPT=$(jq -r '.subdomain // ""' "$OPTS")
 LOCAL_HOST=$(jq -r '.local_host // "homeassistant"' "$OPTS")
-LOCAL_PORT=$(jq -r '(.local_port // 8123) | tonumber' "$OPTS")
+LOCAL_PORT=$(jq -r '.local_port // 8123' "$OPTS" 2>/dev/null || echo 8123)
+# jq с нечисловым local_port больше не роняет скрипт: числовую валидацию делает блок ниже.
 LOG_LEVEL=$(jq -r '.log_level // "info"' "$OPTS")
 
 API_URL="https://selfunnel.ru/api/addon/validate"
